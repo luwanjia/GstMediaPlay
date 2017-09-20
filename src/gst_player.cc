@@ -14,17 +14,18 @@ GstPlayer::~GstPlayer() {
 }
 
 bool GstPlayer::play() {
-    GstElement* videosink;
-    
     if (state_ == STATE_PLAYING) {
         return true;
     }
     
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
     if(GST_STATE_CHANGE_FAILURE != ret) {
-        printf("-- GST: playing");
+        printf("-- GST: playing.\n");
         state_ = STATE_PLAYING;
         return true;
+    }
+    else {
+        printf("-- GST: Failed to play.\n");
     }
   
     return false;
@@ -38,11 +39,15 @@ bool GstPlayer::stop() {
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_READY);
     
     if (GST_STATE_CHANGE_FAILURE != ret) {
-        printf("-- GST: stopped");
+        printf("-- GST: stopped.\n");
         state_ = STATE_STOPPED;
         g_main_loop_quit(main_loop_);
         return true;
     }
+    else {
+        printf("-- GST: Failed to stop.\n");
+    }
+    
     return false;
 }
 
@@ -53,11 +58,19 @@ bool GstPlayer::pause() {
     
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
     if (GST_STATE_CHANGE_FAILURE != ret) {
-      state_ = STATE_PAUSED;
-      return true;
+        printf("-- GST: paused.\n");
+        state_ = STATE_PAUSED;
+        return true;
+    }
+    else {
+        printf("-- GST: Failed to pause.\n");
     }
     
     return false;
+}
+
+MediaState GstPlayer::get_state() {
+    return state_;
 }
 
 bool GstPlayer::Init() {

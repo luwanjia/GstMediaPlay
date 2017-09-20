@@ -19,6 +19,7 @@ public:
     bool play();
     bool stop();
     bool pause();
+    MediaState get_state();
 private:
     GMainLoop*  main_loop_;
     GstElement* pipeline_;
