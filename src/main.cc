@@ -7,6 +7,7 @@
 int main(int argc, char *argv[]) {
     std::string filename;
     unsigned char ch;
+    unsigned int stop_flag = 0;
     
     if (argc < 2) {
         printf("Error: Please input video file name.\n");
@@ -19,6 +20,8 @@ int main(int argc, char *argv[]) {
     mediaplayer.play();
     
     while (1) {
+        if (stop_flag) break;
+        
         ch = getchar();
         switch(ch) {
             case ' ':
@@ -28,6 +31,10 @@ int main(int argc, char *argv[]) {
                 else if (mediaplayer.get_state() == STATE_PAUSED) {
                     mediaplayer.play();
                 }
+                break;
+            case 27:
+                stop_flag = 1;
+                break;
             default:
                 break;
         }
