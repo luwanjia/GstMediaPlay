@@ -1,17 +1,18 @@
 set(TARGET_initialization test_initialization)
 
 include_directories (
-	/usr/include/glib-2.0
-	/usr/include/gstreamer-1.0
-	/usr/lib/x86_64-linux-gnu/glib-2.0/include
+    /usr/include/glib-2.0
+    /usr/include/gstreamer-1.0
+    /usr/lib/x86_64-linux-gnu/glib-2.0/include
+    /usr/lib/x86_64-linux-gnu/gstreamer-1.0/include
 )
 
 set(SOURCE_initialization
-	initialization.c
+    initialization.c
 )
 
 set(LIBRARY_initialization
-	gstreamer-1.0
+    gstreamer-1.0
 )
 
 add_executable(${TARGET_initialization} ${SOURCE_initialization})
