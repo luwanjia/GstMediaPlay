@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include "gst_player.h"
 
-GstPlayer::GstPlayer(const std::string& file_path)
-    : file_path_(file_path) {
+GstPlayer::GstPlayer(const std::string& file_path, bool sync)
+    : file_path_(file_path)
+    , sync_(sync) {
     Init();
 }
 GstPlayer::~GstPlayer() {
@@ -81,6 +82,9 @@ bool GstPlayer::Init() {
     
     // Create pipeline
     description = std::string("filesrc location=") + file_path_ + std::string(" ! decodebin ! videoconvert ! ximagesink");
+    if (!sync_) {
+        description += std::string(" sync=false");
+    }
     pipeline_ = gst_parse_launch(description.c_str(), NULL);
     
     // Get bus

@@ -6,6 +6,7 @@
 
 int main(int argc, char *argv[]) {
     std::string filename;
+    std::string is_sync;
     unsigned char ch;
     unsigned int stop_flag = 0;
     
@@ -15,7 +16,15 @@ int main(int argc, char *argv[]) {
     }
     
     filename = argv[1];
-    GstPlayer mediaplayer(filename);
+    
+    if (argc >=3) {
+        is_sync = argv[2];
+    }
+    else {
+        is_sync = "true";
+    }
+    
+    GstPlayer mediaplayer(filename, is_sync == "false" ? false : true);
   
     mediaplayer.play();
     

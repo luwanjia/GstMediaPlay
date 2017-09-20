@@ -13,7 +13,7 @@ enum MediaState
 
 class GstPlayer {
 public:
-    GstPlayer(const std::string& file_path);
+    GstPlayer(const std::string& file_path, bool sync = true);
     ~GstPlayer();
     
     bool play();
@@ -26,6 +26,7 @@ private:
   
     double volume_;
     MediaState state_;
+    bool sync_;
     std::string file_path_;
     
     bool Init();
