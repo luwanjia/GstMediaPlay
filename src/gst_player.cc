@@ -20,11 +20,6 @@ bool GstPlayer::play() {
         return true;
     }
     
-    g_object_get(pipeline_, "video-sink", &videosink, NULL);
-    if(videosink == NULL) {
-        return false;
-    }
-    
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
     if(GST_STATE_CHANGE_FAILURE != ret) {
         printf("-- GST: playing");
@@ -66,40 +61,26 @@ bool GstPlayer::pause() {
 }
 
 bool GstPlayer::Init() {
-    GstElement* videosink;
-    GstElement* audiosink;
-        
-    // Initialize gstreamer
-    if(gst_init_check(NULL,NULL,NULL)==false) {
-        return false;
-    }
+    std::string description;
     
-    // 
-    main_loop_ = g_main_loop_new(NULL,FALSE);
+    // Initialize gstreamer
+    gst_init(NULL, NULL);
     
     // Create pipeline
-    pipeline_ = gst_element_factory_make("playbin","player");
+    description = std::string("filesrc location=") + file_path_ + std::string(" ! decodebin ! videoconvert ! ximagesink");
+    pipeline_ = gst_parse_launch(description.c_str(), NULL);
     
-    // Create video sink
-    videosink = gst_element_factory_make("ximagesink","videosink");
+    // Get bus
+    GstBus* bus = gst_element_get_bus(pipeline_);
     
-    // Create audio sink
-    audiosink = gst_element_factory_make("alsasink","audiosink");
+    // Create main loop
+    main_loop_ = g_main_loop_new(NULL, FALSE);
     
-    // Check vaild
-    if(pipeline_ == NULL || videosink == NULL || audiosink == NULL) {
-        printf("-- Create pipeline failed.\n");
-    }
+    // Add watch
+    gst_bus_add_signal_watch (bus);
     
-    // Set pipeline
-    g_object_set(G_OBJECT(pipeline_), "audio-sink", audiosink, "video-sink", videosink, "volume", volume_, NULL);
-    
-    // Set uri
-    g_object_set(G_OBJECT(pipeline_), "uri", file_path_.c_str(), NULL);
-    
-    // Listen messages from bus
-    GstBus* bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline_));
-    gst_bus_add_watch(bus, bus_callback, this);
+    // Connect signal
+    g_signal_connect(bus, "message", G_CALLBACK (bus_callback), this);
     
     // Set pipeline ready to play.
     gst_element_set_state(pipeline_, GST_STATE_READY);

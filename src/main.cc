@@ -18,6 +18,9 @@ int main(int argc, char *argv[]) {
   
     mediaplayer.play();
     
+    while (1) {
+        usleep(1000000);
+    }
     printf("-- Exit.\n");
     return 0;
 }
