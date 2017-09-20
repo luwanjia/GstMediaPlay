@@ -6,7 +6,6 @@ include_directories (
     /usr/lib/x86_64-linux-gnu/
     /usr/lib/x86_64-linux-gnu/glib-2.0/include
     /usr/lib/x86_64-linux-gnu/gstreamer-1.0/include
-    .
 )
 
 set(SOURCE
