@@ -3,12 +3,13 @@
 
 GstPlayer::GstPlayer(const std::string& file_path, bool sync)
     : file_path_(file_path)
-    , sync_(sync) {
+    , sync_(sync)
+    , state_(STATE_NULL) {
     Init();
 }
 
 GstPlayer::~GstPlayer() {
-    if(state_ != STATE_STOPPED) {
+    if(state_ != STATE_READY) {
         stop();
     }
 
@@ -19,7 +20,7 @@ bool GstPlayer::play() {
     if (state_ == STATE_PLAYING) {
         return true;
     }
-    else if (state_ == STATE_STOPPED) {
+    else if (state_ == STATE_NULL) {
         Init();
     }
     
@@ -31,6 +32,7 @@ bool GstPlayer::play() {
     }
     else {
         printf("-- GST: Failed to play.\n");
+        Release();
     }
   
     return false;
@@ -38,6 +40,7 @@ bool GstPlayer::play() {
 
 bool GstPlayer::pause() {
     if (state_ != STATE_PLAYING) {
+        printf("-- GST: Is not playing, can not pause.\n");
         return false;
     }
     
@@ -55,23 +58,11 @@ bool GstPlayer::pause() {
 }
 
 bool GstPlayer::stop() {
-    if (state_ == STATE_STOPPED) {
+    if (state_ == STATE_NULL) {
         return true;
     }
     
-    GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_READY);
-    
-    if (GST_STATE_CHANGE_FAILURE != ret) {
-        printf("-- GST: stopped.\n");
-        state_ = STATE_STOPPED;
-        Release();
-        return true;
-    }
-    else {
-        printf("-- GST: Failed to stop.\n");
-    }
-    
-    return false;
+    return Release();
 }
 
 MediaState GstPlayer::get_state() {
@@ -106,16 +97,21 @@ bool GstPlayer::Init() {
     // Set pipeline ready to play.
     gst_element_set_state(pipeline_, GST_STATE_READY);
 
-    state_ = STATE_STOPPED;
+    state_ = STATE_READY;
     
     return true;
 }
 
 bool GstPlayer::Release() {
+    if (state_ == STATE_NULL) {
+        return true;
+    }
     g_main_loop_unref (main_loop_);
     gst_object_unref (bus_);
     gst_element_set_state (pipeline_, GST_STATE_NULL);
     gst_object_unref (pipeline_);
+    
+    state_ = STATE_NULL;
     
     return true;
 }

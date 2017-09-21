@@ -6,7 +6,8 @@
 
 enum MediaState
 {
-    STATE_STOPPED,
+    STATE_NULL,
+    STATE_READY,
     STATE_PLAYING,
     STATE_PAUSED,
 };
