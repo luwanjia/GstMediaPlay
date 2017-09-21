@@ -6,17 +6,21 @@ GstPlayer::GstPlayer(const std::string& file_path, bool sync)
     , sync_(sync) {
     Init();
 }
+
 GstPlayer::~GstPlayer() {
     if(state_ != STATE_STOPPED) {
         stop();
     }
-    gst_object_unref(GST_OBJECT(pipeline_));
-    gst_deinit();
+
+    Release();
 }
 
 bool GstPlayer::play() {
     if (state_ == STATE_PLAYING) {
         return true;
+    }
+    else if (state_ == STATE_STOPPED) {
+        Init();
     }
     
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
@@ -29,26 +33,6 @@ bool GstPlayer::play() {
         printf("-- GST: Failed to play.\n");
     }
   
-    return false;
-}
-
-bool GstPlayer::stop() {
-    if (state_ == STATE_STOPPED) {
-        return true;
-    }
-    
-    GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_READY);
-    
-    if (GST_STATE_CHANGE_FAILURE != ret) {
-        printf("-- GST: stopped.\n");
-        state_ = STATE_STOPPED;
-        g_main_loop_quit(main_loop_);
-        return true;
-    }
-    else {
-        printf("-- GST: Failed to stop.\n");
-    }
-    
     return false;
 }
 
@@ -65,6 +49,26 @@ bool GstPlayer::pause() {
     }
     else {
         printf("-- GST: Failed to pause.\n");
+    }
+    
+    return false;
+}
+
+bool GstPlayer::stop() {
+    if (state_ == STATE_STOPPED) {
+        return true;
+    }
+    
+    GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_READY);
+    
+    if (GST_STATE_CHANGE_FAILURE != ret) {
+        printf("-- GST: stopped.\n");
+        state_ = STATE_STOPPED;
+        Release();
+        return true;
+    }
+    else {
+        printf("-- GST: Failed to stop.\n");
     }
     
     return false;
@@ -88,21 +92,30 @@ bool GstPlayer::Init() {
     pipeline_ = gst_parse_launch(description.c_str(), NULL);
     
     // Get bus
-    GstBus* bus = gst_element_get_bus(pipeline_);
+    bus_ = gst_element_get_bus(pipeline_);
     
     // Create main loop
     main_loop_ = g_main_loop_new(NULL, FALSE);
     
     // Add watch
-    gst_bus_add_signal_watch (bus);
+    gst_bus_add_signal_watch (bus_);
     
     // Connect signal
-    g_signal_connect(bus, "message", G_CALLBACK (bus_callback), this);
+    g_signal_connect(bus_, "message", G_CALLBACK (bus_callback), this);
     
     // Set pipeline ready to play.
     gst_element_set_state(pipeline_, GST_STATE_READY);
 
     state_ = STATE_STOPPED;
+    
+    return true;
+}
+
+bool GstPlayer::Release() {
+    g_main_loop_unref (main_loop_);
+    gst_object_unref (bus_);
+    gst_element_set_state (pipeline_, GST_STATE_NULL);
+    gst_object_unref (pipeline_);
     
     return true;
 }

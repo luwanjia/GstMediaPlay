@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
     std::string filename;
     std::string is_sync;
     unsigned char ch;
-    unsigned int stop_flag = 0;
+    unsigned int exit_flag = 0;
     
     if (argc < 2) {
         printf("Error: Please input video file name.\n");
@@ -29,10 +29,14 @@ int main(int argc, char *argv[]) {
     mediaplayer.play();
     
     while (1) {
-        if (stop_flag) break;
+        if (exit_flag) break;
         
         ch = getchar();
         switch(ch) {
+            case 'p':
+            case 'P':
+                mediaplayer.play();
+                break;
             case ' ':
                 if (mediaplayer.get_state() == STATE_PLAYING) {
                     mediaplayer.pause();
@@ -41,8 +45,13 @@ int main(int argc, char *argv[]) {
                     mediaplayer.play();
                 }
                 break;
-            case 27:
-                stop_flag = 1;
+            case 's':
+            case 'S':
+                mediaplayer.stop();
+                break;
+            case 'q':
+            case 'Q':
+                exit_flag = 1;
                 break;
             default:
                 break;

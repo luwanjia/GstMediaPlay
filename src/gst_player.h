@@ -17,12 +17,13 @@ public:
     ~GstPlayer();
     
     bool play();
-    bool stop();
     bool pause();
+    bool stop();
     MediaState get_state();
 private:
     GMainLoop*  main_loop_;
     GstElement* pipeline_;
+    GstBus* bus_;
   
     double volume_;
     MediaState state_;
@@ -30,6 +31,7 @@ private:
     std::string file_path_;
     
     bool Init();
+    bool Release();
     static gboolean bus_callback(GstBus* bus, GstMessage* msg, gpointer data);
 };
 
