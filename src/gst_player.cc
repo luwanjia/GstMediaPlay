@@ -118,8 +118,7 @@ bool GstPlayer::Release() {
 
 gboolean GstPlayer::bus_callback(GstBus* bus, GstMessage* msg, gpointer data) {
     GstPlayer* media = (GstPlayer*)data;
-    
-    printf("!!! bus_callback: msg = %d\n", GST_MESSAGE_TYPE (msg));
+
     switch (GST_MESSAGE_TYPE (msg)) {
     case GST_MESSAGE_ERROR: {
         printf("-- MSG: ERROR\n");
