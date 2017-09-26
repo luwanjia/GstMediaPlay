@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
     }
     
     
-    GstPlayer mediaplayer(filename, videosink, is_sync == "false" ? false : true);
+    GstPlayer mediaplayer(filename, videosink, is_sync == "false" ? false : true, 0);
   
     mediaplayer.play();
     

@@ -1,10 +1,15 @@
 #include <stdio.h>
 #include "gst_player.h"
 
-GstPlayer::GstPlayer(const std::string& file_path, const std::string& sink, bool sync)
+GstPlayer::GstPlayer()
+    : state_(STATE_NULL) {
+}
+
+GstPlayer::GstPlayer(const std::string& file_path, const std::string& sink, bool sync, guintptr xwinid)
     : file_path_(file_path)
     , sink_(sink)
     , sync_(sync)
+    , xwinid_(xwinid)
     , state_(STATE_NULL) {
     Init();
 }
@@ -15,6 +20,18 @@ GstPlayer::~GstPlayer() {
     }
 
     Release();
+}
+
+bool GstPlayer::open(const std::string& file_path, const std::string& sink, bool sync, guintptr xwinid) {
+    
+    if (state_ != STATE_NULL) return false;
+    
+    file_path_ = file_path;
+    sink_ = sink;
+    sync_ = sync;
+    xwinid_ = xwinid;
+    
+    return Init();
 }
 
 bool GstPlayer::play() {
@@ -68,11 +85,6 @@ bool GstPlayer::stop() {
 
 MediaState GstPlayer::get_state() {
     return state_;
-}
-
-bool GstPlayer::set_windows_id(guintptr id) {
-    xwinid_ = id;
-    return true;
 }
 
 bool GstPlayer::Init() {

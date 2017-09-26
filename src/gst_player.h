@@ -15,14 +15,15 @@ enum MediaState
 
 class GstPlayer {
 public:
-    GstPlayer(const std::string& file_path, const std::string& sink, bool sync = "true");
+    GstPlayer();
+    GstPlayer(const std::string& file_path, const std::string& sink, bool sync = true, guintptr xwinid = 0);
     ~GstPlayer();
     
+    bool open(const std::string& file_path, const std::string& sink, bool sync = true, guintptr xwinid = 0);
     bool play();
     bool pause();
     bool stop();
     MediaState get_state();
-    bool set_windows_id(guintptr id);
 private:
     GMainLoop*  main_loop_;
     GstElement* pipeline_;
