@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[]) {
     std::string filename;
-    std::string videosink = "ximagesink";
+    std::string videosink = "autovideosink";
     std::string is_sync = "true";
     
     unsigned char ch;

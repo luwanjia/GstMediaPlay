@@ -106,9 +106,9 @@ bool GstPlayer::Init() {
     // Create main loop
     main_loop_ = g_main_loop_new(NULL, FALSE);
     
-    // Get sink
+    // Get sink to set display window
     GstElement *sink = gst_element_factory_make (sink_.c_str(), NULL);
-    if (sink) {
+    if (sink && xwinid_) {
         gst_video_overlay_set_window_handle (GST_VIDEO_OVERLAY (sink), xwinid_);
     }
   
