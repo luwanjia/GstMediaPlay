@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include "gst_player.h"
 
-GstPlayer::GstPlayer(const std::string& file_path, bool sync)
+GstPlayer::GstPlayer(const std::string& file_path, const std::string& sink, bool sync)
     : file_path_(file_path)
+    , sink_(sink)
     , sync_(sync)
     , state_(STATE_NULL) {
     Init();
@@ -69,6 +70,11 @@ MediaState GstPlayer::get_state() {
     return state_;
 }
 
+bool GstPlayer::set_windows_id(guintptr id) {
+    xwinid_ = id;
+    return true;
+}
+
 bool GstPlayer::Init() {
     std::string description;
     
@@ -76,7 +82,7 @@ bool GstPlayer::Init() {
     gst_init(NULL, NULL);
     
     // Create pipeline
-    description = std::string("filesrc location=") + file_path_ + std::string(" ! decodebin ! videoconvert ! ximagesink");
+    description = std::string("filesrc location=") + file_path_ + std::string(" ! decodebin ! videoconvert ! ") + sink_;
     if (!sync_) {
         description += std::string(" sync=false");
     }
@@ -88,6 +94,12 @@ bool GstPlayer::Init() {
     // Create main loop
     main_loop_ = g_main_loop_new(NULL, FALSE);
     
+    // Get sink
+    GstElement *sink = gst_element_factory_make (sink_.c_str(), NULL);
+    if (sink) {
+        gst_video_overlay_set_window_handle (GST_VIDEO_OVERLAY (sink), xwinid_);
+    }
+  
     // Add watch
     gst_bus_add_signal_watch (bus_);
     

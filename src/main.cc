@@ -6,25 +6,31 @@
 
 int main(int argc, char *argv[]) {
     std::string filename;
-    std::string is_sync;
+    std::string videosink = "ximagesink";
+    std::string is_sync = "true";
+    
     unsigned char ch;
     unsigned int exit_flag = 0;
     
     if (argc < 2) {
         printf("Error: Please input video file name.\n");
         return 0;
+    }    
+    else if (argc == 2) {
+        filename    = argv[1];
+    }
+    else if (argc == 3) {
+        filename    = argv[1];
+        videosink   = argv[2];
+    }
+    else if (argc == 4) {
+        filename    = argv[1];
+        videosink   = argv[2];
+        is_sync     = argv[3];
     }
     
-    filename = argv[1];
     
-    if (argc >=3) {
-        is_sync = argv[2];
-    }
-    else {
-        is_sync = "true";
-    }
-    
-    GstPlayer mediaplayer(filename, is_sync == "false" ? false : true);
+    GstPlayer mediaplayer(filename, videosink, is_sync == "false" ? false : true);
   
     mediaplayer.play();
     

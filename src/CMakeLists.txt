@@ -29,6 +29,7 @@ set(LIBRARY
     gstreamer-1.0
     gobject-2.0
     glib-2.0
+    gstvideo-1.0
 )
 
 add_executable(${TARGET} ${SOURCE})
