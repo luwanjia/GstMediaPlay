@@ -94,7 +94,7 @@ bool GstPlayer::Init() {
     gst_init(NULL, NULL);
     
     // Create pipeline
-    description = std::string("filesrc location=") + file_path_ + std::string(" ! decodebin ! videoconvert ! ") + sink_;
+    description = std::string("filesrc location=") + file_path_ + std::string(" ! decodebin ! videoconvert ! ") + sink_ + std::string(" name=videosink");
     if (!sync_) {
         description += std::string(" sync=false");
     }
@@ -107,7 +107,7 @@ bool GstPlayer::Init() {
     main_loop_ = g_main_loop_new(NULL, FALSE);
     
     // Get sink to set display window
-    GstElement *sink = gst_element_factory_make (sink_.c_str(), NULL);
+    GstElement *sink = gst_bin_get_by_name(GST_BIN (pipeline_), "videosink");
     if (sink && xwinid_) {
         gst_video_overlay_set_window_handle (GST_VIDEO_OVERLAY (sink), xwinid_);
     }
