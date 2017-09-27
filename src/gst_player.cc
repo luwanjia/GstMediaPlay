@@ -40,7 +40,8 @@ bool GstPlayer::play() {
         return true;
     }
     else if (state_ == STATE_NULL) {
-        Init();
+        printf("-- GST: Please open first.\n");
+        return false;
     }
     
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
@@ -113,7 +114,10 @@ bool GstPlayer::Init() {
     gst_bin_add_many(GST_BIN(pipeline_), ele_filesrc, ele_decodebin, ele_videoconvert, ele_videosink, NULL);
 
     // Link all element in order
-    gst_element_link_many(ele_filesrc, ele_decodebin, ele_videoconvert, ele_videosink, NULL);
+    if (!gst_element_link_many(ele_filesrc, ele_decodebin, ele_videoconvert, ele_videosink, NULL)) {
+        printf("-- GST: Failed to link one or more elements!\n");
+        return false;
+    }
 
     // Set overlay
     if (ele_videosink && xwinid_) {
